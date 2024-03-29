@@ -32,7 +32,7 @@ class SettingState : PersistentStateComponent<SettingState> {
         }
     }
 
-    var backgroundColorInt = arrayOf(0, 0, 0)
+    var backgroundColorInt = arrayOf(60, 63, 65)
     var showReturnCodePanel : Boolean = true
     var returnCodePosition: Int = 0
 
@@ -46,6 +46,6 @@ class SettingState : PersistentStateComponent<SettingState> {
     }
 
     override fun loadState(state: SettingState) {
-        XmlSerializerUtil.copyBean(state, this);
+        XmlSerializerUtil.copyBean(state, this)
     }
 }

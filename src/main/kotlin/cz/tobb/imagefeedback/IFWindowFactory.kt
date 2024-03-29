@@ -11,10 +11,10 @@ class IFWindowFactory : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(proj: Project, toolWindow: ToolWindow) {
         val panel = IFComponent()
-        toolWindow.title = "Image Execution Feedback"
+        toolWindow.title = "Image Feedback"
         IFExecutionListener.IFComponent = panel
         val content = ContentFactory.getInstance().createContent(panel, "", false)
         toolWindow.contentManager.addContent(content)
-        toolWindow.stripeTitle = "Image Execution Feedback"
+        toolWindow.stripeTitle = "Image Feedback"
     }
 }

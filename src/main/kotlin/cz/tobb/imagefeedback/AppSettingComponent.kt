@@ -11,8 +11,10 @@ import com.intellij.ui.table.JBTable
 import com.intellij.ui.util.*
 import org.jdesktop.swingx.HorizontalLayout
 import org.jdesktop.swingx.VerticalLayout
-import java.awt.BorderLayout
-import java.awt.Color
+import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.net.URI
 import javax.swing.*
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
 import javax.swing.table.TableColumn
@@ -31,6 +33,7 @@ class AppSettingComponent {
     private val tableModel = FeedbackImageTableModel()
     private val table = JBTable(tableModel)
     private val scrollPane = JBScrollPane(table)
+    private val urlToGithubIssue = "https://github.com/tomash1234/jbplugin-ImageFeedback/issues/1"
 
     init {
         initBackgroundColor()
@@ -64,7 +67,8 @@ class AppSettingComponent {
         buttonMoveUp.icon = AllIcons.General.ArrowUp
         val buttonMoveDown = JButton()
         buttonMoveDown.icon = AllIcons.General.ArrowDown
-        val locPanel = JPanel(HorizontalLayout(0))
+        val locPanel = JPanel()
+        locPanel.layout = BoxLayout(locPanel, BoxLayout.X_AXIS)
         buttonAdd.preferredWidth = 40
         buttonRemove.preferredWidth = 40
         buttonMoveUp.preferredWidth = 40
@@ -74,6 +78,20 @@ class AppSettingComponent {
         locPanel.add(buttonRemove)
         locPanel.add(buttonMoveUp)
         locPanel.add(buttonMoveDown)
+
+        // link to github issue with cool gifs
+        val labelGithub = JBLabel("<HTML><U>Example of cool GIFs</U></HTML>", SwingConstants.RIGHT)
+        labelGithub.foreground = Color(70, 106, 255)
+        labelGithub.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
+        labelGithub.font = labelGithub.font.deriveFont(12.0f).deriveFont(Font.BOLD)
+        labelGithub.addMouseListener(object : MouseAdapter(
+        ) {
+            override fun mouseClicked(e: MouseEvent?) {
+                Desktop.getDesktop().browse(URI(urlToGithubIssue))
+            }
+        })
+        locPanel.add(Box.createHorizontalGlue())
+        locPanel.add(labelGithub)
 
         val wholeTablePanel = JPanel(VerticalLayout())
         wholeTablePanel.add(locPanel)

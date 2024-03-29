@@ -1,7 +1,5 @@
 package cz.tobb.imagefeedback
 
-import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.maximumHeight
 import com.intellij.ui.util.preferredHeight
 import com.intellij.ui.util.preferredWidth
@@ -19,6 +17,7 @@ class IFComponent : JPanel(){
     private val header = JPanel()
     private val random = Random()
     private val imageCache = mutableMapOf<String, Image>()
+    private val imagePanel = JPanel()
 
     init {
         val settings = SettingState.getInstance()
@@ -32,14 +31,14 @@ class IFComponent : JPanel(){
 
     private fun initHeader(returnCodePos : Int){
         header.layout = BoxLayout(header, BoxLayout.Y_AXIS)
-        header.isOpaque = false
         val labelBackground = JPanel()
         label.font = label.font.deriveFont(13.0f)
         label.border = JBUI.Borders.empty(1)
         label.foreground = Color.WHITE
         labelBackground.maximumHeight = 40
-        labelBackground.background = Color(0, 0, 0, 180)
+        labelBackground.background = Color.BLACK
         labelBackground.add(label)
+        header.isOpaque = false
 
         if(returnCodePos == 0){
             header.add(labelBackground)
@@ -52,12 +51,12 @@ class IFComponent : JPanel(){
     }
 
     private fun initImage(): JPanel {
-        val imagePanel = JPanel()
         imagePanel.layout = BoxLayout(imagePanel, BoxLayout.X_AXIS)
         imagePanel.add(Box.createHorizontalGlue())
         imagePanel.add(imageLabel)
         imagePanel.add(Box.createHorizontalGlue())
-        imageLabel.isVisible = false
+        imageLabel.isVisible = true
+        label.font = label.font.deriveFont(12.0f)
         return imagePanel
     }
 
@@ -66,7 +65,7 @@ class IFComponent : JPanel(){
             return imageCache[path]
         }
         try {
-            val url: URL = URL(path)
+            val url = URL(path)
             val image = Toolkit.getDefaultToolkit().getImage(url)
             imageCache[path] = image
             return image
@@ -75,18 +74,23 @@ class IFComponent : JPanel(){
         }
     }
 
+    private fun showErrorMessage(text : String){
+        imageLabel.icon = null
+        imageLabel.text = text
+        imageLabel.isVisible = true
+        imageLabel.foreground = Color.RED
+    }
     private fun showImage(feedbackImage : FeedbackImage) {
         val image: Image? = obtainImage(feedbackImage.path)
         if(image == null){
-            imageLabel.icon = null
-            imageLabel.text = "Could not show image \"${feedbackImage.path}\""
-            imageLabel.isVisible = true
+            showErrorMessage("Could not show image \"${feedbackImage.path}\"")
             return
         }
         val icSize = ImageIcon(image)
         val width = (feedbackImage.height * (1.0f * icSize.iconWidth / icSize.iconHeight)).toInt()
         val scaledImage = image.getScaledInstance(width, feedbackImage.height, Image.SCALE_DEFAULT)
         imageLabel.icon = ImageIcon(scaledImage)
+        imageLabel.background = null
         imageLabel.isVisible = true
         imageLabel.preferredWidth = width
         imageLabel.preferredHeight = feedbackImage.height
@@ -96,8 +100,9 @@ class IFComponent : JPanel(){
     private fun generalUpdate(code : Int){
         val settings = SettingState.getInstance()
         header.isVisible = settings.showReturnCodePanel
-        background = Color(settings.backgroundColorInt[0], settings.backgroundColorInt[1],
-            settings.backgroundColorInt[2])
+        imagePanel.background = Color(settings.backgroundColorInt[0],
+                                        settings.backgroundColorInt[1],
+                                        settings.backgroundColorInt[2])
         if(settings.returnCodePosition == 0){
             if(header.getComponent(0) !is JPanel){
                 header.remove(0)
@@ -109,8 +114,11 @@ class IFComponent : JPanel(){
                 header.add(Box.createVerticalGlue(), 0)
             }
         }
-        label.text = "Return code: $code"
-        label.foreground = JBColor.WHITE
+        if(code == -1){
+            label.text = "Processing"
+        }else{
+            label.text = "Return code: $code"
+        }
     }
 
     private fun selectImageToShow(type : FeedBackImageType): FeedbackImage? {
@@ -122,27 +130,20 @@ class IFComponent : JPanel(){
         return allImageOfType[random.nextInt(allImageOfType.size)]
     }
 
-    fun update(code : Int){
+    fun update(type : FeedBackImageType, code : Int){
         val settings = SettingState.getInstance()
         generalUpdate(code)
-        if(code == 0 && settings.showImageSuccess){
-            selectImageToShow(FeedBackImageType.SUCCESS)?.let { showImage(it) }
-        }else if(code != 0 && settings.showImageFail){
-            selectImageToShow(FeedBackImageType.FAIL)?.let { showImage(it) }
+        if(type == FeedBackImageType.SUCCESS && settings.showImageSuccess ||
+            type == FeedBackImageType.PROCESSING && settings.showImageProcessing ||
+            type == FeedBackImageType.FAIL && settings.showImageFail){
+            val selectedImage = selectImageToShow(type)
+            if(selectedImage != null){
+                showImage(selectedImage)
+            }else{
+                showErrorMessage("No image configured for $type.")
+            }
         }else{
             imageLabel.isVisible = false
         }
-        label.repaint()
-    }
-
-    fun processing(){
-        generalUpdate(-1)
-        val settings = SettingState.getInstance()
-        if(settings.showImageProcessing){
-            selectImageToShow(FeedBackImageType.PROCESSING)?.let { showImage(it) }
-        }else{
-            imageLabel.isVisible = false
-        }
-        label.text = "Processing"
     }
 }
