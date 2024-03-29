@@ -8,15 +8,20 @@
   <name>Image Execution Feedback</name>
 
   <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor email="tomashromada1@gmail.com" url="https://www.yourcompany.com">Tomas Hromada</vendor>
+  <vendor email="tomashromada1@gmail.com" url="https://github.com/tomash1234/jbplugin-ImageFeedback">Tomas Hromada</vendor>
 
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
   <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    Spice up your coding experience with humorous <b>GIFs</b> and images!
+    A random image from customizable list is shown in a new tool window.
+    Images are shown based on return code of your execution.
   ]]></description>
+
+  <change-notes><![CDATA[
+    Fix icon
+  ]]></change-notes>
 
   <!-- Product and plugin compatibility requirements.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->

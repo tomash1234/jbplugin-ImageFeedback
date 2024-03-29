@@ -140,7 +140,8 @@ class IFComponent : JPanel(){
             if(selectedImage != null){
                 showImage(selectedImage)
             }else{
-                showErrorMessage("No image configured for $type.")
+                showErrorMessage("No image set for $type." +
+                        "Set it in: Settings -> Tools -> Image Feedback Settings")
             }
         }else{
             imageLabel.isVisible = false
